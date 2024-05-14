@@ -28,12 +28,12 @@ import com.flowpowered.math.vector.Vector2i;
 import de.bluecolored.bluemap.core.logger.Logger;
 import de.bluecolored.bluemap.core.mca.MCAChunk;
 import de.bluecolored.bluemap.core.mca.MCAWorld;
+import de.bluecolored.bluemap.core.storage.Compression;
 import de.bluecolored.bluemap.core.world.Chunk;
 import de.bluecolored.bluemap.core.world.EmptyChunk;
 import de.bluecolored.bluemap.core.world.Region;
 import net.querz.nbt.CompoundTag;
 import net.querz.nbt.Tag;
-import net.querz.nbt.mca.CompressionType;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -87,14 +87,17 @@ public class MCARegion implements Region {
             raf.seek(offset + 4); // +4 skip chunk size
 
             byte compressionTypeByte = raf.readByte();
-            CompressionType compressionType = compressionTypeByte == 3 ?
-                            CompressionType.NONE :
-                            CompressionType.getFromID(compressionTypeByte);
-            if (compressionType == null) {
-                throw new IOException("Invalid compression type " + compressionTypeByte);
+            Compression compression;
+            switch (compressionTypeByte) {
+                case 0 :
+                case 3 : compression = Compression.NONE; break;
+                case 1 : compression = Compression.GZIP; break;
+                case 2 : compression = Compression.DEFLATE; break;
+                case 4 : compression = Compression.LZ4; break;
+                default: throw new IOException("Unknown chunk compression-id: " + compressionTypeByte);
             }
 
-            DataInputStream dis = new DataInputStream(new BufferedInputStream(compressionType.decompress(new FileInputStream(raf.getFD()))));
+            DataInputStream dis = new DataInputStream(new BufferedInputStream(compression.decompress(new FileInputStream(raf.getFD()))));
             Tag<?> tag = Tag.deserialize(dis, Tag.DEFAULT_MAX_DEPTH);
             if (tag instanceof CompoundTag) {
                 MCAChunk chunk = MCAChunk.create(world, (CompoundTag) tag);
