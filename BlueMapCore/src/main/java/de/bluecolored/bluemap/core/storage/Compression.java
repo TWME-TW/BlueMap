@@ -26,8 +26,8 @@ package de.bluecolored.bluemap.core.storage;
 
 import io.airlift.compress.zstd.ZstdInputStream;
 import io.airlift.compress.zstd.ZstdOutputStream;
-import net.jpountz.lz4.LZ4FrameInputStream;
-import net.jpountz.lz4.LZ4FrameOutputStream;
+import net.jpountz.lz4.LZ4BlockInputStream;
+import net.jpountz.lz4.LZ4BlockOutputStream;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,7 +44,7 @@ public enum Compression {
     GZIP("gzip", ".gz", GZIPOutputStream::new, GZIPInputStream::new),
     DEFLATE("deflate", ".deflate", DeflaterOutputStream::new, DeflaterInputStream::new),
     ZSTD("zstd", ".zst", ZstdOutputStream::new, ZstdInputStream::new),
-    LZ4("lz4", ".lz4", LZ4FrameOutputStream::new, LZ4FrameInputStream::new);
+    LZ4("lz4", ".lz4", LZ4BlockOutputStream::new, LZ4BlockInputStream::new);
 
     private final String typeId;
     private final String fileSuffix;
