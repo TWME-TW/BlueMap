@@ -133,12 +133,16 @@ public class BmMap {
     public void renderTile(Vector2i tile) {
         if (!tileFilter.test(tile)) return;
 
+        Logger.global.logInfo("[%s] Start rendering tile %s".formatted(Thread.currentThread().getName(), tile));
+
         long start = System.nanoTime();
 
         hiresModelManager.render(world, tile, lowresTileManager, mapSettings.isSaveHiresLayer());
 
         long end = System.nanoTime();
         long delta = end - start;
+
+        Logger.global.logInfo("[%s] Finished rendering tile %s in %d nanoseconds".formatted(Thread.currentThread().getName(), tile, delta));
 
         renderTimeSumNanos += delta;
         tilesRendered ++;

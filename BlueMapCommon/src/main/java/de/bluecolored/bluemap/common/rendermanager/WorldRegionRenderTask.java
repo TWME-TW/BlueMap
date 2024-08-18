@@ -188,6 +188,9 @@ public class WorldRegionRenderTask implements RenderTask {
 
     private void processTile(int x, int z) {
         Vector2i tile = new Vector2i(tileMin.getX() + x, tileMin.getY() + z);
+
+        Logger.global.logInfo("[%s] Processing tile %s".formatted(Thread.currentThread().getName(), tile));
+
         ActionAndNextState action = tileActions[tileIndex(x, z)];
         TileState resultState = TileState.RENDER_ERROR;
 
